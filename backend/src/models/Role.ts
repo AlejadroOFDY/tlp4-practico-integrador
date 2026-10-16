@@ -1,5 +1,6 @@
-import { DataTypes, Model } from 'sequelize';
+import { DataTypes, Model, type BelongsToManySetAssociationsMixin } from 'sequelize';
 import { DatabaseConnection } from '../db/DatabaseConnection.js';
+import type { Permission } from './Permission.js';
 import type { IRole, RoleCreationAttributes } from './interfaces/IRole.js';
 
 export class Role extends Model<IRole, RoleCreationAttributes> implements IRole {
@@ -7,6 +8,8 @@ export class Role extends Model<IRole, RoleCreationAttributes> implements IRole 
   declare name: string;
   declare createdAt: Date;
   declare updatedAt: Date;
+
+  declare setPermissions: BelongsToManySetAssociationsMixin<Permission, number>;
 }
 
 Role.init(
