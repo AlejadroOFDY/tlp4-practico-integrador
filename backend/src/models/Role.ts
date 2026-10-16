@@ -10,6 +10,7 @@ export class Role extends Model<IRole, RoleCreationAttributes> implements IRole 
   declare updatedAt: Date;
 
   declare setPermissions: BelongsToManySetAssociationsMixin<Permission, number>;
+  declare permissions?: Permission[];
 }
 
 Role.init(

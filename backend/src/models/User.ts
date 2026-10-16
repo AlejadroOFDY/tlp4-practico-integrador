@@ -1,5 +1,6 @@
 import { DataTypes, Model } from 'sequelize';
 import { DatabaseConnection } from '../db/DatabaseConnection.js';
+import type { Role } from './Role.js';
 import type { IUser, UserCreationAttributes } from './interfaces/IUser.js';
 
 export class User extends Model<IUser, UserCreationAttributes> implements IUser {
@@ -10,6 +11,8 @@ export class User extends Model<IUser, UserCreationAttributes> implements IUser 
   declare roleId: number;
   declare createdAt: Date;
   declare updatedAt: Date;
+
+  declare role?: Role;
 }
 
 User.init(
