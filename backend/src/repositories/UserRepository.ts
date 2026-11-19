@@ -10,7 +10,7 @@ export class UserRepository implements IUserRepository {
   }
 
   async findAll(): Promise<User[]> {
-    return User.findAll();
+    return User.findAll({ include: [{ model: Role, as: 'role' }] });
   }
 
   async findById(id: number): Promise<User | null> {
@@ -40,6 +40,6 @@ export class UserRepository implements IUserRepository {
     }
     user.roleId = roleId;
     await user.save();
-    return user;
+    return this.findWithRoleAndPermissions(id);
   }
 }

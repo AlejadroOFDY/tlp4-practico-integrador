@@ -5,12 +5,17 @@ import type { UserService } from '../services/UserService.js';
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
-  private toResponse(user: User): { id: number; name: string; email: string; roleId: number } {
+  private toResponse(user: User): {
+    id: number;
+    name: string;
+    email: string;
+    role: string;
+  } {
     return {
       id: user.id,
       name: user.name,
       email: user.email,
-      roleId: user.roleId,
+      role: user.role?.name ?? '',
     };
   }
 

@@ -35,9 +35,12 @@ Aplicación de mesa de ayuda para gestionar tickets con estados (`ABIERTO`, `EN_
    docker compose up --build
    ```
 4. El seed de roles, permisos y usuarios de prueba se ejecuta automáticamente al arrancar el backend.
-5. Abrir la API:
+5. Abrir la aplicación:
+   - Frontend: http://localhost:8080
    - API: http://localhost:4000/api
    - Healthcheck: http://localhost:4000/api/health
+
+   El frontend se sirve con nginx, que además reenvía las peticiones `/api/*` al backend dentro de la red de Docker. No hace falta configurar CORS ni ninguna URL extra.
 
 ## Ejecución sin Docker (opcional)
 
@@ -47,12 +50,20 @@ Aplicación de mesa de ayuda para gestionar tickets con estados (`ABIERTO`, `EN_
    cp backend/.env.example backend/.env
    ```
    Ajustar `DB_USER` y `DB_PASSWORD` según el PostgreSQL local.
-3. Instalar dependencias y ejecutar:
+3. Instalar dependencias y ejecutar el backend:
    ```bash
    cd backend
    npm install
    npm run dev
    ```
+4. En otra terminal, ejecutar el frontend:
+   ```bash
+   cd frontend
+   npm install
+   npm run dev
+   ```
+   El frontend queda en http://localhost:5173 y consume la API en `http://localhost:4000/api`
+   (valor por defecto de `VITE_API_URL`).
 
 ## Variables de entorno
 
@@ -60,12 +71,12 @@ Aplicación de mesa de ayuda para gestionar tickets con estados (`ABIERTO`, `EN_
 | -------------- | ------------------------------ | --------------------------- |
 | `DB_HOST`      | Host de la base de datos       | `db`                        |
 | `DB_PORT`      | Puerto de la base de datos     | `5432`                      |
-| `DB_USER`      | Usuario                        | `tlp4`                      |
-| `DB_PASSWORD`  | Contraseña                     | `tlp4`                      |
+| `DB_USER`      | Usuario                        | `postgres`                  |
+| `DB_PASSWORD`  | Contraseña                     | `postgres`                  |
 | `DB_NAME`      | Nombre de la base              | `tp_integrador`             |
 | `JWT_SECRET`   | Clave para firmar los tokens   | `cambiar-esto`              |
 | `PORT`         | Puerto del backend             | `4000`                      |
-| `VITE_API_URL` | URL de la API para el frontend | `http://localhost:4000/api` |
+| `VITE_API_URL` | URL de la API para el frontend | `/api` (Docker) o `http://localhost:4000/api` (dev) |
 
 ## Usuarios de prueba
 
@@ -114,7 +125,18 @@ Aplicación de mesa de ayuda para gestionar tickets con estados (`ABIERTO`, `EN_
 
 ## Frontend
 
-Pendiente de integración por el compañero de frontend. Debe agregarse como servicio `frontend` en `docker-compose.yml` (ya hay un comentario guía) usando `VITE_API_URL=http://localhost:4000/api`. La URL esperada del frontend es http://localhost:5173.
+Aplicación en React + TypeScript (Vite) que consume la API con `fetch` nativo. Incluye:
+
+- Login, registro y sesión con JWT (`AuthContext`).
+- Rutas protegidas y componentes que se muestran según los permisos del rol (`ProtectedRoute`, `Can`).
+- Listado, detalle, alta, edición, cambio de estado y eliminación de tickets según permisos.
+- Suscripción y desuscripción a tickets.
+- Bandeja de notificaciones y contador de no leídas con *polling* cada 8 segundos (`NotificationBell`).
+- Administración de usuarios: listado y asignación de rol (`/admin/users`).
+
+En Docker se compila con `VITE_API_URL=/api` y nginx reenvía `/api` al servicio `backend`
+(definido en `frontend/nginx.conf`). Para desarrollo local se usa
+`http://localhost:4000/api` por defecto.
 
 ## Patrones y principios SOLID
 

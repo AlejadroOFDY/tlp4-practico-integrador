@@ -1,0 +1,8 @@
+# Variables de entorno reales (solo se versiona .env.example)
+.env
+
+# Logs
+*.log
+
+# Sistema
+.DS_Store

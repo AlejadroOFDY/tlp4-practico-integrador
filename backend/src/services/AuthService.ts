@@ -16,7 +16,8 @@ export interface AuthUser {
   id: number;
   name: string;
   email: string;
-  roleId: number;
+  role: string;
+  permissions: string[];
 }
 
 export interface AuthResponse {
@@ -68,12 +69,16 @@ export class AuthService {
 
   private async buildResponse(user: User): Promise<AuthResponse> {
     const token = await JwtAdapter.generateToken({ id: user.id });
+    const userWithRole = await this.userRepository.findWithRoleAndPermissions(user.id);
+    const permissions = userWithRole?.role?.permissions ?? [];
+
     return {
       user: {
         id: user.id,
         name: user.name,
         email: user.email,
-        roleId: user.roleId,
+        role: userWithRole?.role?.name ?? '',
+        permissions: permissions.map((permission) => permission.action),
       },
       token,
     };
